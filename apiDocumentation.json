@@ -1,0 +1,437 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"description": "Это документация API для сервера, поддерживающий форум",
+		"version": "1.0.0",
+		"title": "API for the forum"
+	},
+	"host": "127.0.0.1:8000",
+	"basePath": "/",
+	"tags": [
+		{
+			"name": "topic",
+			"description": "Доступ к постам форума"
+		},
+		{
+			"name": "statics",
+			"description": "Страница форума"
+		},
+		{
+			"name": "pollRequest",
+			"description": "Посты форума"
+		}
+	],
+	"paths": {
+		"/topic?version={version}&timeWait={timeWait}": {
+			"get": {
+				"tags": [
+					"pollRequest"
+				],
+				"parameters": [
+					{
+						"name": "version",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					},
+					{
+						"name": "timeWait",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"summary": "Вывод всех топиков",
+				"description": "Длинный запрос с задаваемым временем ожидания timeWait",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/Topics"
+						}
+					},
+					"400": {
+						"description": "Bad request"
+					}
+				}
+			}
+		},
+		"/index.html": {
+			"get": {
+				"tags": [
+					"statics"
+				],
+				"summary": "Страница форума",
+				"description": "Данный запрос отдаёт клиенту статический файл сервера",
+				"produces": [
+					"text/plain"
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation"
+					},
+					"404": {
+						"description": "File not found"
+					}
+				}
+			}
+		},
+		"/topic": {
+			"get": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Вывод списка постов",
+				"description": "Данный запрос выводит список тем, авторов, контент и комментарии постов",
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"schema": {
+							"$ref": "#/definitions/Topics"
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Добавляет тему",
+				"description": "Данный запрос добавляет тему, автора и контент",
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"description": "Новый топик",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/TopicPut"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Topic successfully added"
+					}
+				}
+			}
+		},
+		"/topicone?id={topicId}": {
+			"get": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Вывод одной темы",
+				"description": "Данный запрос отдаёт клиенту только одну тему форума",
+				"parameters": [
+					{
+						"name": "topicId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"schema": {
+							"$ref": "#/definitions/Topic"
+						}
+					},
+					"404": {
+						"description": "Topic not found"
+					}
+				}
+			}
+		},
+		"/topic/{topicId}": {
+			"put": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Редактирует тему",
+				"description": "Данный запрос редактирует тему поста",
+				"parameters": [
+					{
+						"name": "topicId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"description": "Новый комментарий",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/TopicPut"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Topic successfully changes"
+					},
+					"400": {
+						"description": "Bad request"
+					},
+					"404": {
+						"description": "Topic not found"
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Удаляет тему",
+				"description": "Данный запрос удаляет полностью тему и все его поля",
+				"parameters": [
+					{
+						"name": "topicId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Topic deleted"
+					},
+					"404": {
+						"description": "Topic not found"
+					}
+				}
+			}
+		},
+		"/topic/{topicId}/comment": {
+			"post": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Добавляет комментарий",
+				"description": "Данный запрос добавляет комментарий к определённой теме",
+				"parameters": [
+					{
+						"name": "topicId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"description": "Добавление комментария",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/Comment"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Comment successfully added"
+					},
+					"400": {
+						"description": "Bad request"
+					},
+					"404": {
+						"description": "Topic not found"
+					}
+				}
+			}
+		},
+		"/topic/{topicId}/{commentId}": {
+			"put": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Редактирует комментарий",
+				"description": "Данный запрос редактирует комментарий определённого поста",
+				"parameters": [
+					{
+						"name": "topicId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					},
+					{
+						"name": "commentId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					},
+					{
+						"in": "body",
+						"name": "body",
+						"description": "Новый изменённый комментарий",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/Comment"
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Comment successfully changes"
+					},
+					"400": {
+						"description": "Bad request"
+					},
+					"404": {
+						"description": "Topic not found or Comment not found"
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"topic"
+				],
+				"summary": "Удаляет комментарий",
+				"description": "Данный запрос удаляет комментарий определённого поста",
+				"parameters": [
+					{
+						"name": "topicId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					},
+					{
+						"name": "commentId",
+						"in": "path",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Comment deleted"
+					},
+					"404": {
+						"description": "Topic not found or Comment not found"
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"TopicPut": {
+			"type": "object",
+			"properties": {
+				"author": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"content": {
+					"type": "string"
+				}
+			}
+		},
+		"Topic": {
+			"type": "object",
+			"properties": {
+				"author": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"content": {
+					"type": "string"
+				},
+				"comment": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "integer"
+							},
+							"author": {
+								"type": "string"
+							},
+							"message": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		},
+		"Comment": {
+			"type": "object",
+			"properties": {
+				"author": {
+					"type": "string"
+				},
+				"message": {
+					"type": "string"
+				}
+			}
+		},
+		"Topics": {
+			"type": "object",
+			"properties": {
+				"topics": {
+					"type": "array",
+					"items": {
+						"type": "array",
+						"items": {
+							"oneOf": [
+								{
+									"type": "integer"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"author": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"content": {
+											"type": "string"
+										},
+										"comment": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id": {
+														"type": "integer"
+													},
+													"author": {
+														"type": "string"
+													},
+													"message": {
+														"type": "string"
+													}
+												}
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				},
+				"version": {
+					"type": "integer"
+				}
+			}
+		}
+	}
+}
